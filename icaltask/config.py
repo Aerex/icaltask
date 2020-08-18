@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from requests.auth import HTTPDigestAuth, HTTPBasicAuth
 from requests_toolbelt import GuessAuth
 from six.moves import configparser

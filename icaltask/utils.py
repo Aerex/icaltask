@@ -1,12 +1,4 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
-# Adds taskwarrior tasks into a calendar as iCal tasks
-
-# Install the required python packages
-# $ pip install requests
-# $ pip install vobject
-
 
 import vobject
 import uuid
