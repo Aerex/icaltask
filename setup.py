@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 f = open('README.rst')
 
 long_description = f.read().strip()
-long_description = long_description.split('readme', 1)[1]
+long_description = long_description.split('split here', 1)[1]
 f.close()
 
 

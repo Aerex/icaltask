@@ -11,6 +11,8 @@ import sys
 import os
 from requests import auth, put, request
 
+PROD_ID = '//taskwarrior/{system} {release}/EN'
+
 
 # TODO:
 # Handle logs
@@ -66,18 +68,25 @@ def task_to_ical(task, config):
         return
 
     ical = vobject.iCalendar()
-    ical.add('prodid').value = config.get(section='general', option='prod_id_template').format(release=release(), system=system())
+    ical.add('prodid').value = PROD_ID.format(release=release(), system=system())
     ical.add('vtodo')
     vobj = ical.vtodo
 
-    if not 'uid' in task:
+    if not 'uid' in vobj.contents:
         vobj.add('uid').value = task['uuid']
         task['uid'] = vobj.uid.value
         vobj.add('created').value = get_rfc_datetime(datetime.utcnow())
     if 'description' in task:
         vobj.add('summary').value = task['description']
     if 'annotations' in task:
-        vobj.add('summary').value = '\n'.join(task['description'] + task['annotations'])
+        annotations = '\n'.join(str(annotation['description']) for annotation in task['annotations'])
+        if len(task['annotations']) == 1:
+            annotations = '\n' + annotations
+        annotations_with_description = task['description'] + annotations
+        if 'summary' in vobj.contents:
+            vobj.summary.value = annotations_with_description
+        else:
+            vobj.add('summary').value = annotations_with_description
     if 'entry' in task:
         vobj.add('dtstamp').value = get_rfc_datetime(task['entry'])
     if 'start' in task:
@@ -88,11 +97,11 @@ def task_to_ical(task, config):
         vobj.add('last-modified').value = get_rfc_datetime(task['modified'])
     if 'priority' in task:
         priority = {
-            'H': 0,
-            'M': 5,
-            'L': 10
+            'H': '0',
+            'M': '5',
+            'L': '10'
         }
-        vobj.add('priority').value = priority.get(task['priority'], None)
+        vobj.add('priority').value = priority.get(str(task['priority']), None)
     if 'due' in task:
         vobj.add('due').value = get_rfc_datetime(task['due'])
     if 'recu' in task or 'until' in task:
