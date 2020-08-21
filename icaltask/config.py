@@ -3,7 +3,13 @@ from requests.auth import HTTPDigestAuth, HTTPBasicAuth
 from requests_toolbelt import GuessAuth
 from six.moves import configparser
 import subprocess
+import logging
 from os import environ, path, makedirs
+
+logger = logging.getLogger(__name__)
+
+def get_log_level(level):
+    return getattr(logging, level)
 
 def load_sample_config(configparser):
     xdg_config_file_path = path.join(environ.get('XDG_CONFIG_HOME'), 'icaltask', 'icaltaskrc')
@@ -38,6 +44,10 @@ def load_config():
         load_sample_config(cp)
 
     # TODO: Validate config
+    logging.basicConfig(
+        level=get_log_level(cp.get('general', 'log.level')),
+        filename=path.expanduser(cp.get('general', 'log.file'))
+    )
 
     return cp
 

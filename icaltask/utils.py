@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import vobject
+import logging
 import uuid
 import urllib.parse as urlparse
+import logging
 from datetime import datetime, timezone
 from platform import system, release
 from tzlocal import get_localzone
@@ -12,6 +14,16 @@ import os
 from requests import auth, put, request
 
 PROD_ID = '//taskwarrior/{system} {release}/EN'
+logger = logging.getLogger(__name__)
+logger.propagate = True
+
+if logger.level >= 10:
+    try: # for Python 3
+        from http.client import HTTPConnection
+    except ImportError:
+        from httplib import HTTPConnection
+    HTTPConnection.debuglevel = 1
+
 
 
 # TODO:
@@ -38,10 +50,13 @@ def send_ical_to_server(ical, url, config):
     try:
         headers = {
             "Content-Type": "text/calendar",
-            "Content-Length": str(len(ical.serialize()))
         }
-        method = 'delete' if ical.vtodo.status == 'CANCELLED' else 'put'
-        data = None if method == 'delete' else ical.serialize()
+        method = 'delete'
+        data = None
+        if ical.vtodo.status.value != 'CANCELLED':
+            method = 'put'
+            data = ical.serialize()
+            headers['Content-Length'] = str(len(ical.serialize()))
         request(
             method=method,
             url=url,
@@ -50,6 +65,7 @@ def send_ical_to_server(ical, url, config):
             headers=headers
         )
     except Exception as e:
+        logger.error('ERROR: {0}'.format(e))
         print('ERROR: ', e)
         sys.exit(1)
 
@@ -65,6 +81,7 @@ def task_to_ical(task, config):
     """ Taskwarrior --> iCalendar vobject."""
 
     if 'status' in task and task['status'] != 'pending' and not 'uid' in task:
+        logger.info('Nothing to do with task {}'.format(task['id']))
         return
 
     ical = vobject.iCalendar()
@@ -80,13 +97,7 @@ def task_to_ical(task, config):
         vobj.add('summary').value = task['description']
     if 'annotations' in task:
         annotations = '\n'.join(str(annotation['description']) for annotation in task['annotations'])
-        if len(task['annotations']) == 1:
-            annotations = '\n' + annotations
-        annotations_with_description = task['description'] + annotations
-        if 'summary' in vobj.contents:
-            vobj.summary.value = annotations_with_description
-        else:
-            vobj.add('summary').value = annotations_with_description
+        vobj.add('description').value = annotations
     if 'entry' in task:
         vobj.add('dtstamp').value = get_rfc_datetime(task['entry'])
     if 'start' in task:
