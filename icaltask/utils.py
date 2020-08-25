@@ -27,9 +27,8 @@ if logger.level >= 10:
 
 
 # TODO:
-# Handle logs
-# Move code into other modules
 # Maybe use a tag or something to disable importing task to ical
+# Use jinja to add task properties as tags using `add_tags_template` config prop
 
 def urljoin(*args):
     return '/'.join(map(lambda x: str(x).rstrip('/'), args))
@@ -41,7 +40,11 @@ def generate_cal_url(task, cal, config):
     if config.getboolean(section='general', option='use_project_as_displaynames') and 'project' in task:
         displayname = task['project']
         if not config.has_section(displayname):
-            sys.exit(0)
+            if config.getboolean(section='general', option='default_calendar'):
+                displayname = config.get(section='general', option='default_calendar')
+            else:
+                logger.warn('Could not find a calendar to import task {} to'.format(task['uuid']))
+                sys.exit(0)
         cal_base_url = config.get(section=displayname, option='url')
     return urljoin(cal_base_url, generated_ics_file_path)
 
@@ -80,10 +83,6 @@ def get_rfc_datetime(value):
 def task_to_ical(task, config):
     """ Taskwarrior --> iCalendar vobject."""
 
-    if 'status' in task and task['status'] != 'pending' and not 'uid' in task:
-        logger.info('Nothing to do with task {}'.format(task['id']))
-        return
-
     ical = vobject.iCalendar()
     ical.add('prodid').value = PROD_ID.format(release=release(), system=system())
     ical.add('vtodo')
@@ -103,7 +102,7 @@ def task_to_ical(task, config):
     if 'start' in task:
         vobj.add('dtstart').value = get_rfc_datetime(task['start'])
     if 'end' in task:
-        vobj.add('dtend').value = get_rfc_datetime(task['end'])
+        vobj.add('completed').value = get_rfc_datetime(task['end'])
     if 'modified' in task:
         vobj.add('last-modified').value = get_rfc_datetime(task['modified'])
     if 'priority' in task:
