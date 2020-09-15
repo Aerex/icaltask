@@ -17,8 +17,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 # TODO:
-# Handle logs
-# Move code into other modules
 # Maybe use a tag or something to disable importing task to ical
 
 old = sys.stdin.readline()

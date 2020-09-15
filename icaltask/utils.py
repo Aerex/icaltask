@@ -35,13 +35,16 @@ def urljoin(*args):
 
 def generate_cal_url(task, cal, config):
     """ Generate calendar url for new task """
-    cal_base_url = config.get(section='general', option='base_url')
+    cal_base_url = config.get(section='general', option='default_calendar')
     generated_ics_file_path = '{uid}.ics'.format(uid=cal.vtodo.uid.value)
     if config.getboolean(section='general', option='use_project_as_displaynames') and 'project' in task:
         displayname = task['project']
         if not config.has_section(displayname):
-            if config.getboolean(section='general', option='default_calendar'):
-                displayname = config.get(section='general', option='default_calendar')
+            if config.get(section='general', option='default_calendar'):
+                return urljoin(
+                    config.get(section='general', option='default_calendar'),
+                    generated_ics_file_path
+                )
             else:
                 logger.warn('Could not find a calendar to import task {} to'.format(task['uuid']))
                 sys.exit(0)

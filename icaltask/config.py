@@ -8,6 +8,8 @@ from os import environ, path, makedirs
 
 logger = logging.getLogger(__name__)
 
+def validate(cp):
+    pass
 def get_log_level(level):
     return getattr(logging, level)
 
@@ -32,7 +34,7 @@ def load_config():
         If neither can be found. A sample configuration will be generated under $XDG_CONFIG_HOME/icaltask/icaltaskrc
     """
     # TODO: Add defaults using sample or something else
-    cp = CalConfig(default_section="general")
+    cp = CalConfig(defaults=default_values, default_section="general")
     xdg_config_home = (environ.get('XDG_CONFIG_HOME') or path.expanduser('~/.config'))
     config_file_paths = [
         (environ.get('ICAL_TASK_RC') or ''),
@@ -40,10 +42,12 @@ def load_config():
         path.expanduser('~/.icaltaskrc')
     ]
 
+    # TODO: Validate config
+    #validate(cp)
+
     if len(cp.read(config_file_paths, encoding='utf8')) == 0:
         load_sample_config(cp)
 
-    # TODO: Validate config
     logging.basicConfig(
         level=get_log_level(cp.get('general', 'log.level')),
         filename=path.expanduser(cp.get('general', 'log.file'))
