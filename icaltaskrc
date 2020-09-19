@@ -3,15 +3,6 @@
 # The default calendar to send tasks to
 default_calendar = https://icaltask.com/calendars/default 
 
-
-# You can customize how the PRODID property on the calendar event object. 
-# `{system}`, `{release}`  to return the system's os (e.g Linux)
-prod_id_template = //taskwarrior/{system} {release}/EN
-
-# If a task is under a project the task will be sent to calendars by mapping the project to the respective calendar displayname. 
-# Otherwise the default_calendar will be used 
-use_project_as_displaynames = yes
-
 # The  method to retrieve credentials for authentication. The available methods are listed below
 # `command` - Get credentials through a command
 # `plain` - Get password from plain text 

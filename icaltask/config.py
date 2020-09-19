@@ -34,7 +34,7 @@ def load_config():
         If neither can be found. A sample configuration will be generated under $XDG_CONFIG_HOME/icaltask/icaltaskrc
     """
     # TODO: Add defaults using sample or something else
-    cp = CalConfig(defaults=default_values, default_section="general")
+    cp = CalConfig(default_section="general")
     xdg_config_home = (environ.get('XDG_CONFIG_HOME') or path.expanduser('~/.config'))
     config_file_paths = [
         (environ.get('ICAL_TASK_RC') or ''),

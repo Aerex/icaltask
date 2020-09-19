@@ -20,6 +20,9 @@ def _uninstall_hooks():
 def _push(args):
     pass
 
+def _copy_config(args):
+    pass
+
 def _install_hooks():
     symlink(HOOKS_PY, ON_LAUNCH_PY)
     symlink(HOOKS_PY, ON_MODIFY_PY)
@@ -35,7 +38,9 @@ def main():
     hooks = subcmds.add_parser('install-hooks', help='Install taskwarrior hooks')
     hooks = subcmds.add_parser('uninstall-hooks', help='Uninstall taskwarrior hooks')
 
-    push = subcmds.add_parser('push', help='Push new tasks to iCalendar server')
+    push = subcmds.add_parser('push', help='Execute a one-way sync to push non-iCal tasks to iCalendar server')
+
+    copy_config = subcmds.add_parser('copy-config', help='Copy sample configuration. A prompt will appear to provide options to store configuration')
     args = cmd.parse_args()
 
     if args.icaltask == 'install-hooks':
@@ -44,6 +49,8 @@ def main():
         _uninstall_hooks()
     elif args.icaltask == 'push':
         _push(args)
+    elif args.icaltask == 'copy-config':
+        _copy_config(args)
     else:
         cmd.print_help()
 
