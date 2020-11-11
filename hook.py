@@ -22,23 +22,31 @@ logger = logging.getLogger(__name__)
 old = sys.stdin.readline()
 new = sys.stdin.readline()
 config = load_config()
-task_type = 'modified'
+TASK_TYPE = 'new'
 
 try:
     if not new:
+        original_task = json.loads(old)
+        modified_task =  None
         task = json.loads(old)
     else:
+        original_task = json.loads(old)
+        modified_task = json.loads(new)
         task = json.loads(new)
-        task_type = 'new'
+        TASK_TYPE = 'modified'
 
-    cal = task_to_ical(task, config)
+    cal = task_to_ical(original_task, modified_task)
 
     url = generate_cal_url(task, cal, config)
-    logger.debug('Importing {task_type} task {id} to calendar {url}'.format(task_type=task_type, id=task['uuid'], url=url))
-    logger.debug(json.dumps(task))
+    logger.info('url %s', url)
+    logger.debug('Importing %s task %s to calendar %s', TASK_TYPE, task['uuid'], url)
+    logger.debug('Original JSON %s', old.strip('\n'))
+    if TASK_TYPE == 'modified':
+        logger.debug('Modified JSON %s', new.strip('\n'))
 
     if cal:
+        logger.debug('CAL %s', cal.serialize())
         send_ical_to_server(cal, url, config)
-except IOError as e:
-    logger.warn('WARN: %s', e)
+except IOError as error:
+    logger.warn('WARN: %s', error)
     sys.exit(0)

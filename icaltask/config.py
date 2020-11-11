@@ -14,7 +14,7 @@ def get_log_level(level):
     return getattr(logging, level)
 
 def load_sample_config(configparser):
-    xdg_config_file_path = path.join(environ.get('XDG_CONFIG_HOME'), 'icaltask', 'icaltaskrc')
+    xdg_config_file_path: str = path.join(environ.get('XDG_CONFIG_HOME'), 'icaltask', 'icaltaskrc')
     makedirs(xdg_config_file_path)
     sample_config_file_path = path.join(
         path.dirname(__file__),

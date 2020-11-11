@@ -24,20 +24,35 @@ if logger.level >= 10:
         from httplib import HTTPConnection
     HTTPConnection.debuglevel = 1
 
-
-
 # TODO:
 # Maybe use a tag or something to disable importing task to ical
 # Use jinja to add task properties as tags using `add_tags_template` config prop
 
+
+def merge_task(original, modified):
+    """ Merge original task with modified task  """
+    task = {}
+    if not modified:
+        task = original
+    for prop in modified:
+        if (prop in original and original[prop] != modified[prop])\
+                or not prop in original:
+            task[prop] = modified[prop]
+        elif not prop in modified:
+            task[prop] = None
+        else:
+            task[prop] = original[prop]
+    return task
+
 def urljoin(*args):
     return '/'.join(map(lambda x: str(x).rstrip('/'), args))
 
+ 
 def generate_cal_url(task, cal, config):
     """ Generate calendar url for new task """
     cal_base_url = config.get(section='general', option='default_calendar')
     generated_ics_file_path = '{uid}.ics'.format(uid=cal.vtodo.uid.value)
-    if config.getboolean(section='general', option='use_project_as_displaynames') and 'project' in task:
+    if 'project' in task:
         displayname = task['project']
         if not config.has_section(displayname):
             if config.get(section='general', option='default_calendar'):
@@ -50,6 +65,7 @@ def generate_cal_url(task, cal, config):
                 sys.exit(0)
         cal_base_url = config.get(section=displayname, option='url')
     return urljoin(cal_base_url, generated_ics_file_path)
+
 
 def send_ical_to_server(ical, url, config):
     """ Send icalendar event to calendar server"""
@@ -75,6 +91,7 @@ def send_ical_to_server(ical, url, config):
         print('ERROR: ', e)
         sys.exit(1)
 
+
 def get_rfc_datetime(value):
     """ Taskwarrior datetime string --> datetime RFC spec."""
     if isinstance(value, str):
@@ -83,17 +100,18 @@ def get_rfc_datetime(value):
         dt = value
     return dt.replace(tzinfo=timezone.utc).astimezone(get_localzone())
 
-def task_to_ical(task, config):
+def task_to_ical(original, modified):
     """ Taskwarrior --> iCalendar vobject."""
 
+    task = merge_task(original, modified)
     ical = vobject.iCalendar()
     ical.add('prodid').value = PROD_ID.format(release=release(), system=system())
     ical.add('vtodo')
     vobj = ical.vtodo
 
-    if not 'uid' in vobj.contents:
-        vobj.add('uid').value = task['uuid']
-        task['uid'] = vobj.uid.value
+    if 'uid' not in vobj.contents:
+        vobj.add('uid').value = original['uuid']
+        original['uid'] = vobj.uid.value
         vobj.add('created').value = get_rfc_datetime(datetime.utcnow())
     if 'description' in task:
         vobj.add('summary').value = task['description']
@@ -135,4 +153,3 @@ def task_to_ical(task, config):
 
     print(json.dumps(task))
     return ical
-
