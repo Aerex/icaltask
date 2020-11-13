@@ -35,14 +35,14 @@ try:
         task = json.loads(new)
         TASK_TYPE = 'modified'
 
+    logger.debug('Original JSON %s', old.strip('\n'))
+    if TASK_TYPE == 'modified':
+        logger.debug('Modified JSON %s', new.strip('\n'))
     cal = task_to_ical(original_task, modified_task)
 
     url = generate_cal_url(task, cal, config)
     logger.info('url %s', url)
     logger.debug('Importing %s task %s to calendar %s', TASK_TYPE, task['uuid'], url)
-    logger.debug('Original JSON %s', old.strip('\n'))
-    if TASK_TYPE == 'modified':
-        logger.debug('Modified JSON %s', new.strip('\n'))
 
     if cal:
         logger.debug('CAL %s', cal.serialize())

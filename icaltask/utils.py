@@ -33,7 +33,7 @@ def merge_task(original, modified):
     """ Merge original task with modified task  """
     task = {}
     if not modified:
-        task = original
+        return original
     for prop in modified:
         if (prop in original and original[prop] != modified[prop])\
                 or not prop in original:
