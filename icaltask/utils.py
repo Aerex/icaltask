@@ -140,12 +140,19 @@ def task_to_ical(original, modified):
         rrule['freq'] = task['recu'] if 'recu' in task else None
         rrule['until'] = task['until'] if 'until' in task else None
     if 'status' in task:
-        status = {
+        vtodo_status = {
             'pending': 'NEEDS-ACTION',
             'completed': 'COMPLETED',
+            'deleted': 'CANCELLED',
+            'waiting': 'IN-PROCESS'
+        }
+        ical_status = {
+            'waiting': 'TENATIVE',
             'deleted': 'CANCELLED'
         }
-        vobj.add('status').value = status.get(task['status'], None)
+        vobj.add('status').value = vtodo_status.get(task['status'], None)
+        ical.add('status').value = ical_status.get(task['status'], 'CONFIRMED')
+
     if 'tags' in task:
         vobj.add('categories').value = task['tags']
     if 'geo' in task:
