@@ -51,6 +51,7 @@ def urljoin(*args):
 def generate_cal_url(task, cal, config):
     """ Generate calendar url for new task """
     cal_base_url = config.get(section='general', option='default_calendar')
+
     generated_ics_file_path = '{uid}.ics'.format(uid=cal.vtodo.uid.value)
     if 'project' in task:
         displayname = task['project']
@@ -99,6 +100,7 @@ def get_rfc_datetime(value):
     else:
         dt = value
     return dt.replace(tzinfo=timezone.utc).astimezone(get_localzone())
+
 
 def task_to_ical(original, modified):
     """ Taskwarrior --> iCalendar vobject."""
@@ -158,5 +160,4 @@ def task_to_ical(original, modified):
     if 'geo' in task:
         vobj.add('geo').value = task['geo']
 
-    print(json.dumps(task))
     return ical

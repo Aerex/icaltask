@@ -1,13 +1,6 @@
 #!/usr/bin/env /usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# Adds taskwarrior tasks into a calendar as iCal tasks
-
-# Install the required python packages
-# $ pip install requests
-# $ pip install vobject
-
-
 from icaltask.config import load_config
 from icaltask.utils import task_to_ical, generate_cal_url, send_ical_to_server
 import sys

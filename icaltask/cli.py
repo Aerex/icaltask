@@ -8,9 +8,16 @@ import argparse
 
 PROJ_DIR = Path(__file__).resolve().parent.parent
 HOOKS_PY: str = '{PROJ_DIR}/hook.py'.format(PROJ_DIR=PROJ_DIR)
+ICALTASKRC: str = 'icaltaskrc'
 TASK_HOOK_DIR: str = path.expanduser('~/.task/hooks')
 ON_ADD_PY: str = '{TASKS_HOOKS_DIR}/on-add.icaltask.py'.format(TASKS_HOOKS_DIR=TASK_HOOK_DIR)
 ON_MODIFY_PY: str = '{TASKS_HOOKS_DIR}/on-modify.icaltask.py'.format(TASKS_HOOKS_DIR=TASK_HOOK_DIR)
+UDA_CONFIGS = {
+    'uda.uid.type': 'string',
+    'uda.uid.label': '"iCal UID"',
+    'uda.geo.type': 'string',
+    'uda.geo.label': '"iCal GEO"'
+}
 SYSTEM: str
 if 'linux' in platform:
     SYSTEM = 'Linux'
@@ -23,71 +30,85 @@ else:
 
 
 def _uninstall():
-    unlink(ON_ADD_PY)
-    unlink(ON_MODIFY_PY)
-    print('{FILE} hook has been successfully unlinked from system'.format(FILE=ON_ADD_PY))
-    print('{FILE} hook has been successfully unlinked from system'.format(FILE=ON_MODIFY_PY))
+    for file in [ON_ADD_PY, ON_MODIFY_PY]:
+        if not path.exists(file):
+            print('{FILE} already uninstalled'.format(FILE=file))
+        else:
+            unlink(file)
+            print('{FILE} hook has been successfully unlinked from system'.format(FILE=file))
+
+    for uda_config in UDA_CONFIGS.keys():
+        cmd = 'task rc.confirmation=off rc.verbose=off config {CONFIG_LABEL}'.format(
+            CONFIG_LABEL=uda_config
+        )
+        subprocess.run(cmd, shell=True, check=True)
+        print('Removed {} configuration from taskrc'.format(uda_config))
 
 def _push(args):
     pass
 
 
 def _copy_config():
+    print('copy-config')
     fname: str = path.join(
         path.dirname(__file__),
         'docs/example_configuration.rst'
     )
     with open(fname, 'r') as f:
-        readme = f.read()
-        config = readme.split('.. example')[1][9:]
+        config = f.read()
 
-    config_dir: str = path.expanduser('~')
+    config_dir: str = path.expanduser('~/.config/icaltask')
     if SYSTEM == 'Windows':
         config_dir: str = 'AppData/icaltask/'
 
     if not path.exists(config_dir):
         makedirs(config_dir)
+    fname = config_dir + '/' + ICALTASKRC
+    if path.exists(fname):
+        override_config_res = input('{} already exists. Are you sure you want to override it? [Yy]: '.format(ICALTASKRC))
+        if override_config_res not in ['y', 'Y']:
+            return
     with open(fname, 'w') as c:
         c.write(config)
-    chmod(config_dir, 0o755)
-
+        chmod(config_dir, 0o755)
 
 def _install():
-    symlink(HOOKS_PY, ON_ADD_PY)
-    symlink(HOOKS_PY, ON_MODIFY_PY)
-    subprocess.run('task config uda.uid.type string', shell=True, check=True)
-    subprocess.run('task config uda.uid.label "iCal UID"', shell=True, check=True)
-    subprocess.run('task config uda.geo.type string', shell=True, check=True)
-    subprocess.run('task config uda.geo.label "iCal GEO"', shell=True, check=True)
+    for file in [ON_ADD_PY, ON_MODIFY_PY]:
+        if path.exists(file):
+            print('{FILE} already installed'.format(FILE=file))
+        else:
+            symlink(HOOKS_PY, file)
+            print('{FILE} hook has been successfully symlinked to system'.format(FILE=file))
 
-    print('{FILE} hook has been successfully symlinked to system'.format(FILE=ON_ADD_PY))
-    print('{FILE} hook has been successfully symlinked to system'.format(FILE=ON_MODIFY_PY))
-    print('Added uda.uid.label "iCal UID" configuration to taskrc')
-    print('Added uda.uid.type string configuration to taskrc')
-    print('Added uda.geo.label "iCal GEO" configuration to taskrc')
-    print('Added uda.geo.type string configuration to taskrc')
+    for uda_config in UDA_CONFIGS.keys():
+        cmd = 'task rc.confirmation=off rc.verbose=off config {CONFIG_LABEL} {CONFIG_VALUE}'.format(
+            CONFIG_LABEL=uda_config,
+            CONFIG_VALUE=UDA_CONFIGS[uda_config]
+        )
+        subprocess.run(cmd, shell=True, check=True)
+        print('Added {} configuration to taskrc'.format(uda_config))
 
 
 def main():
     cmd = argparse.ArgumentParser(prog='icaltask', description='Synchronize taskwarrior tasks with an iCalendar server')
     subcmds = cmd.add_subparsers(dest='icaltask')
 
-    install = subcmds.add_parser('install', help='Install taskwarrior hooks and configs for icaltask')
-    uninstall = subcmds.add_parser('uninstall', help='Uninstall taskwarrior hooks and configs for icaltask')
+    subcmds.add_parser('install', help='Install taskwarrior hooks and configs for icaltask')
+    subcmds.add_parser('uninstall', help='Uninstall taskwarrior hooks and configs for icaltask')
 
     push = subcmds.add_parser('push', help='Execute a one-way sync to push non-iCal tasks to iCalendar server')
 
-    copy_config = subcmds.add_parser('copy-config', help='Copy sample configuration. A prompt will appear to provide options to store configuration')
+    subcmds.add_parser('copy-config', help='Copy sample configuration. A prompt will appear to provide options to store configuration')
     args = cmd.parse_args()
 
     if args.icaltask == 'install':
-        install()
+        _install()
     elif args.icaltask == 'uninstall':
-        uninstall()
+        _uninstall()
     elif args.icaltask == 'push':
         push(args)
     elif args.icaltask == 'copy-config':
-        copy_config(args)
+        _copy_config()
     else:
         cmd.print_help()
 

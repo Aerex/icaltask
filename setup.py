@@ -22,7 +22,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    install_requires=['vobject', 'requests'],
+    install_requires=['vobject', 'requests', 'tzlocal'],
     long_description=read('README.rst'),
     tests_require=[
         "pytest_mock",
