@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from os import symlink, path, unlink, write, makedirs, chmod
+from os import symlink, path, unlink, makedirs, chmod
 from sys import platform
 from pathlib import Path
 import subprocess
@@ -44,6 +44,7 @@ def _uninstall():
         subprocess.run(cmd, shell=True, check=True)
         print('Removed {} configuration from taskrc'.format(uda_config))
 
+
 def _push(args):
     pass
 
@@ -72,6 +73,7 @@ def _copy_config():
         c.write(config)
         chmod(config_dir, 0o755)
 
+
 def _install():
     for file in [ON_ADD_PY, ON_MODIFY_PY]:
         if path.exists(file):
@@ -98,7 +100,7 @@ def main():
 
     push = subcmds.add_parser('push', help='Execute a one-way sync to push non-iCal tasks to iCalendar server')
 
-    subcmds.add_parser('copy-config', help='Copy sample configuration. A prompt will appear to provide options to store configuration')
+    subcmds.add_parser('copy-config', help='Copy sample configuration to configuration directory.')
     args = cmd.parse_args()
 
     if args.icaltask == 'install':
