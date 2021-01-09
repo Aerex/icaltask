@@ -44,16 +44,16 @@ def _uninstall():
         subprocess.run(cmd, shell=True, check=True)
         print('Removed {} configuration from taskrc'.format(uda_config))
 
-
-def _push(args):
-    pass
-
-
 def _copy_config():
-    print('copy-config')
+    '''
+    Copy over the same configuration file into the configuration directory.
+    If the file already exists the user will have the option to override the existing config
+    For Linux/MacOS the configuration directory will under `~/.config/icaltask` folder
+    For Windows the configuration directory will under the `AppData/icaltask` folder
+    '''
     fname: str = path.join(
         path.dirname(__file__),
-        'docs/example_configuration.rst'
+        '../icaltaskrc'
     )
     with open(fname, 'r') as f:
         config = f.read()
@@ -98,7 +98,7 @@ def main():
     subcmds.add_parser('install', help='Install taskwarrior hooks and configs for icaltask')
     subcmds.add_parser('uninstall', help='Uninstall taskwarrior hooks and configs for icaltask')
 
-    push = subcmds.add_parser('push', help='Execute a one-way sync to push non-iCal tasks to iCalendar server')
+    subcmds.add_parser('push', help='Execute a one-way sync to push non-iCal tasks to iCalendar server')
 
     subcmds.add_parser('copy-config', help='Copy sample configuration to configuration directory.')
     args = cmd.parse_args()
@@ -107,8 +107,6 @@ def main():
         _install()
     elif args.icaltask == 'uninstall':
         _uninstall()
-    elif args.icaltask == 'push':
-        push(args)
     elif args.icaltask == 'copy-config':
         _copy_config()
     else:
