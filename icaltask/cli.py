@@ -5,6 +5,7 @@ from sys import platform
 from pathlib import Path
 import subprocess
 import argparse
+from icaltask.utils import get_system
 
 PROJ_DIR = Path(__file__).resolve().parent.parent
 HOOKS_PY: str = '{PROJ_DIR}/hook.py'.format(PROJ_DIR=PROJ_DIR)
@@ -18,16 +19,6 @@ UDA_CONFIGS = {
     'uda.geo.type': 'string',
     'uda.geo.label': '"iCal GEO"'
 }
-SYSTEM: str
-if 'linux' in platform:
-    SYSTEM = 'Linux'
-elif 'bsd' in platform:
-    SYSTEM = 'BSD'
-elif 'darwin' in platform:
-    SYSTEM = 'MacOS'
-else:
-    SYSTEM = 'Windows'
-
 
 def _uninstall():
     for file in [ON_ADD_PY, ON_MODIFY_PY]:
@@ -59,7 +50,7 @@ def _copy_config():
         config = f.read()
 
     config_dir: str = path.expanduser('~/.config/icaltask')
-    if SYSTEM == 'Windows':
+    if get_system(platform) == 'Windows':
         config_dir: str = 'AppData/icaltask/'
 
     if not path.exists(config_dir):

@@ -1,14 +1,18 @@
 [general]
-# The default calendar to send tasks to
-default_calendar = 
+# The url for the default calendar
+default_calendar = https://example.com/dav.php/calendar/example
 
+## The minimum log level. 
+# Allowed values are DEBUG, INFO, NOTICE, WARNING, ERROR, CRITICAL, ALERT, EMERGENCY
 log.level = 
+
+## The location of the log file. The directory must be writable
 log.file = 
 
 # The  method to retrieve credentials for authentication. The available methods are listed below
-# `command` - Get credentials through a command
-# `plain` - Get password from plain text 
-# The type of authentication. Either digest or basic 
+# `digest` - Get credentials through a command
+# `basic` - Get password from plain text 
+# The type of authentication. Either digest, basic or leave it blank if you don't know
 auth_type = digest
 
 
@@ -19,6 +23,7 @@ password.eval = pass calendar/default | head -n 1
 
 [work]
 # Authentication credentials for work calendar
+# If authentication credential is not found use credentials set in general
 url = https://icaltask.com/calendars/work
 username = user 
 password.eval = pass calendar/work | head -n 1

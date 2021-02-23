@@ -3,7 +3,7 @@
 import vobject
 import logging
 import uuid
-import urllib.parse as urlparse
+from urllib.parse import urlparse
 import logging
 from datetime import datetime, timezone
 from platform import system, release
@@ -28,6 +28,32 @@ if logger.level >= 10:
 # Maybe use a tag or something to disable importing task to ical
 # Use jinja to add task properties as tags using `add_tags_template` config prop
 
+
+def is_uri(uri):
+    """
+        True, if uri is valid uri. Must contain http schema and address to be valid
+        eg. https://example.com/ or https://example.com/path
+
+    """
+    try:
+        parsed_uri = urlparse(uri)
+        return all([parsed_uri.scheme, parsed_uri.netloc])
+    except:
+        return False
+
+def get_system(platform):
+    '''
+    Return the system based off the running platform (eg. linux)
+    '''
+    if 'linux' in platform:
+        system = 'Linux'
+    elif 'bsd' in platform:
+        system = 'BSD'
+    elif 'darwin' in platform:
+        system = 'MacOS'
+    else:
+        system = 'Windows'
+    return system
 
 def merge_task(original, modified):
     """ Merge original task with modified task  """
@@ -99,6 +125,7 @@ def get_rfc_datetime(value):
         dt = datetime.strptime(value, '%Y%m%dT%H%M%SZ')
     else:
         dt = value
+
     return dt.replace(tzinfo=timezone.utc).astimezone(get_localzone())
 
 
@@ -143,10 +170,10 @@ def task_to_ical(original, modified):
         rrule['until'] = task['until'] if 'until' in task else None
     if 'status' in task:
         vtodo_status = {
-            'pending': 'NEEDS-ACTION',
+            'pending':   'NEEDS-ACTION',
             'completed': 'COMPLETED',
-            'deleted': 'CANCELLED',
-            'waiting': 'IN-PROCESS'
+            'deleted':   'CANCELLED',
+            'waiting':   'IN-PROCESS'
         }
         ical_status = {
             'waiting': 'TENATIVE',
