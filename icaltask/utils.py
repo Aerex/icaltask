@@ -3,7 +3,7 @@
 import vobject
 import logging
 import uuid
-import urllib.parse as urlparse
+from urllib.parse import urlparse
 import logging
 from datetime import datetime, timezone
 from platform import system, release
@@ -29,6 +29,32 @@ if logger.level >= 10:
 # Use jinja to add task properties as tags using `add_tags_template` config prop
 
 
+def is_uri(uri):
+    """
+        True, if uri is valid uri. Must contain http schema and address to be valid
+        eg. https://example.com/ or https://example.com/path
+
+    """
+    try:
+        parsed_uri = urlparse(uri)
+        return all([parsed_uri.scheme, parsed_uri.netloc])
+    except:
+        return False
+
+def get_system(platform):
+    '''
+    Return the system based off the running platform (eg. linux)
+    '''
+    if 'linux' in platform:
+        system = 'Linux'
+    elif 'bsd' in platform:
+        system = 'BSD'
+    elif 'darwin' in platform:
+        system = 'MacOS'
+    else:
+        system = 'Windows'
+    return system
+
 def merge_task(original, modified):
     """ Merge original task with modified task  """
     task = {}
@@ -51,6 +77,7 @@ def urljoin(*args):
 def generate_cal_url(task, cal, config):
     """ Generate calendar url for new task """
     cal_base_url = config.get(section='general', option='default_calendar')
+
     generated_ics_file_path = '{uid}.ics'.format(uid=cal.vtodo.uid.value)
     if 'project' in task:
         displayname = task['project']
@@ -98,7 +125,9 @@ def get_rfc_datetime(value):
         dt = datetime.strptime(value, '%Y%m%dT%H%M%SZ')
     else:
         dt = value
+
     return dt.replace(tzinfo=timezone.utc).astimezone(get_localzone())
+
 
 def task_to_ical(original, modified):
     """ Taskwarrior --> iCalendar vobject."""
@@ -140,16 +169,22 @@ def task_to_ical(original, modified):
         rrule['freq'] = task['recu'] if 'recu' in task else None
         rrule['until'] = task['until'] if 'until' in task else None
     if 'status' in task:
-        status = {
-            'pending': 'NEEDS-ACTION',
+        vtodo_status = {
+            'pending':   'NEEDS-ACTION',
             'completed': 'COMPLETED',
+            'deleted':   'CANCELLED',
+            'waiting':   'IN-PROCESS'
+        }
+        ical_status = {
+            'waiting': 'TENATIVE',
             'deleted': 'CANCELLED'
         }
-        vobj.add('status').value = status.get(task['status'], None)
+        vobj.add('status').value = vtodo_status.get(task['status'], None)
+        ical.add('status').value = ical_status.get(task['status'], 'CONFIRMED')
+
     if 'tags' in task:
         vobj.add('categories').value = task['tags']
     if 'geo' in task:
         vobj.add('geo').value = task['geo']
 
-    print(json.dumps(task))
     return ical

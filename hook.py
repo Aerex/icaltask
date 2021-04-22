@@ -1,13 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Adds taskwarrior tasks into a calendar as iCal tasks
-
-# Install the required python packages
-# $ pip install requests
-# $ pip install vobject
-
-
 from icaltask.config import load_config
 from icaltask.utils import task_to_ical, generate_cal_url, send_ical_to_server
 import sys
@@ -28,9 +21,11 @@ try:
     if not new:
         original_task = json.loads(old)
         modified_task =  None
+        print(old)
         task = json.loads(old)
     else:
         original_task = json.loads(old)
+        print(new)
         modified_task = json.loads(new)
         task = json.loads(new)
         TASK_TYPE = 'modified'

@@ -1,6 +1,26 @@
-icaltask - A taskwarrior hook to import tasks as vtodo calendar events
-======================================================================
+icaltask - Synchronize between Taskwarrior and iCalendar TODO events
+#####################################################################
 
-.. split here
+.. image:: https://img.shields.io/badge/version-0.0.1-blue.svg?cacheSeconds=2592000
+   :alt: version
+   :width: 100%
+   :align: center
 
-`icaltask` is a commandline for managing and creating a hook to import taskwarrior tasks into a iCal server as VTODO calendar events. 
+## Install
+==========
+.. code-block::bash
+   $ pip install icaltask
+
+## Usage
+========
+
+Copy sample configuration 
+-------------------------
+.. code-block::bash
+   $ icaltask copy-config
+
+Hooks and UDA Configs
+----------------
+Run the following command to create the on-add and on-modify hooks. This will also add the necessary UDA configuration into your taskwarrior configuration file
+.. code-block::bash
+   $ icaltask install
