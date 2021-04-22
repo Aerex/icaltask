@@ -28,7 +28,6 @@ if logger.level >= 10:
 # Maybe use a tag or something to disable importing task to ical
 # Use jinja to add task properties as tags using `add_tags_template` config prop
 
-
 def is_uri(uri):
     """
         True, if uri is valid uri. Must contain http schema and address to be valid
@@ -73,7 +72,7 @@ def merge_task(original, modified):
 def urljoin(*args):
     return '/'.join(map(lambda x: str(x).rstrip('/'), args))
 
- 
+
 def generate_cal_url(task, cal, config):
     """ Generate calendar url for new task """
     cal_base_url = config.get(section='general', option='default_calendar')
@@ -92,7 +91,6 @@ def generate_cal_url(task, cal, config):
                 sys.exit(0)
         cal_base_url = config.get(section=displayname, option='url')
     return urljoin(cal_base_url, generated_ics_file_path)
-
 
 def send_ical_to_server(ical, url, config):
     """ Send icalendar event to calendar server"""
@@ -118,7 +116,6 @@ def send_ical_to_server(ical, url, config):
         print('ERROR: ', e)
         sys.exit(1)
 
-
 def get_rfc_datetime(value):
     """ Taskwarrior datetime string --> datetime RFC spec."""
     if isinstance(value, str):
@@ -127,7 +124,6 @@ def get_rfc_datetime(value):
         dt = value
 
     return dt.replace(tzinfo=timezone.utc).astimezone(get_localzone())
-
 
 def task_to_ical(original, modified):
     """ Taskwarrior --> iCalendar vobject."""
@@ -149,7 +145,7 @@ def task_to_ical(original, modified):
         vobj.add('description').value = annotations
     if 'entry' in task:
         vobj.add('dtstamp').value = get_rfc_datetime(task['entry'])
-    if 'start' in task:
+    if 'start' in task or 'wait' in task:
         vobj.add('dtstart').value = get_rfc_datetime(task['start'])
     if 'end' in task:
         vobj.add('completed').value = get_rfc_datetime(task['end'])
@@ -183,7 +179,6 @@ def task_to_ical(original, modified):
         }
         vobj.add('status').value = vtodo_status.get(task['status'], None)
         ical.add('status').value = ical_status.get(task['status'], 'CONFIRMED')
-
     if 'tags' in task:
         vobj.add('categories').value = task['tags']
     if 'geo' in task:
