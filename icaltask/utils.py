@@ -160,8 +160,6 @@ def task_to_ical(original, modified):
         vobj.add('priority').value = priority.get(str(task['priority']), None)
     if 'due' in task:
         vobj.add('due').value = get_rfc_datetime(task['due'])
-    if 'until' in task:
-        vobj.add('dstart').value = get_rfc_datetime(task['until'])
     if 'recu' in task or 'until' in task:
         rrule = vobj.add('rrule')
         rrule['freq'] = task['recu'] if 'recu' in task else None
