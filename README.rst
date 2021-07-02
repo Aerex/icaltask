@@ -1,26 +1,30 @@
-icaltask - Synchronize between Taskwarrior and iCalendar TODO events
-#####################################################################
+icaltask 
+========
 
 .. image:: https://img.shields.io/badge/version-0.0.1-blue.svg?cacheSeconds=2592000
    :alt: version
    :width: 100%
    :align: center
 
-## Install
-==========
-.. code-block::bash
-   $ pip install icaltask
+icaltask is a Taskwarrior hook that  
 
-## Usage
-========
+Install
+-------
+::
 
-Copy sample configuration 
--------------------------
-.. code-block::bash
-   $ icaltask copy-config
+   $ python3 setup.py install
+
+Configuration
+-------------
 
 Hooks and UDA Configs
-----------------
+~~~~~~~~~~~~~~~~~~~~~
 Run the following command to create the on-add and on-modify hooks. This will also add the necessary UDA configuration into your taskwarrior configuration file
-.. code-block::bash
-   $ icaltask install
+::
+  
+  $ icaltask install 
+
+To remove the hooks and UDA configuration run the following command
+ 
+::
+  $ icaltask uninstall
