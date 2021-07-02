@@ -135,8 +135,11 @@ def task_to_ical(original, modified):
     vobj = ical.vtodo
 
     if 'uid' not in vobj.contents:
-        vobj.add('uid').value = original['uuid']
-        original['uid'] = vobj.uid.value
+        if 'uid' in original:
+            vobj.add('uid').value = original['uid']
+        else
+            vobj.add('uid').value = original['uuid']
+            original['uid'] = vobj.uid.value
         vobj.add('created').value = get_rfc_datetime(datetime.utcnow())
     if 'description' in task:
         vobj.add('summary').value = task['description']
@@ -146,7 +149,8 @@ def task_to_ical(original, modified):
     if 'entry' in task:
         vobj.add('dtstamp').value = get_rfc_datetime(task['entry'])
     if 'start' in task or 'wait' in task:
-        vobj.add('dtstart').value = get_rfc_datetime(task['start'])
+        dstart = task['wait'] if 'wait' in task else task['start']
+        vobj.add('dtstart').value = get_rfc_datetime(dstart)
     if 'end' in task:
         vobj.add('completed').value = get_rfc_datetime(task['end'])
     if 'modified' in task:
