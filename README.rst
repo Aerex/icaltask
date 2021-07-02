@@ -25,6 +25,6 @@ Run the following command to create the on-add and on-modify hooks. This will al
   $ icaltask install 
 
 To remove the hooks and UDA configuration run the following command
- 
 ::
+
   $ icaltask uninstall
