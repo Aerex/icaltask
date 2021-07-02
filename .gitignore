@@ -1,4 +1,6 @@
 .vim
 __pycache__
 .mypy_cache
-
+build
+dist
+icaltask.egg-info
