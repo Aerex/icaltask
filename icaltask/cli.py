@@ -7,7 +7,7 @@ import subprocess
 import argparse
 from icaltask.utils import get_system
 
-PROJ_DIR = Path(__file__).resolve().parent.parent
+PROJ_DIR = Path(__file__).resolve().parent
 HOOKS_PY: str = '{PROJ_DIR}/hook.py'.format(PROJ_DIR=PROJ_DIR)
 ICALTASKRC: str = 'icaltaskrc'
 TASK_HOOK_DIR: str = path.expanduser('~/.task/hooks')
