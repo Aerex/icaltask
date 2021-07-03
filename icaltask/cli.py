@@ -89,7 +89,8 @@ def main():
     subcmds.add_parser('install', help='Install taskwarrior hooks and configs for icaltask')
     subcmds.add_parser('uninstall', help='Uninstall taskwarrior hooks and configs for icaltask')
 
-    subcmds.add_parser('push', help='Execute a one-way sync to push non-iCal tasks to iCalendar server')
+    # TODO: in progress
+    #subcmds.add_parser('push', help='Execute a one-way sync to push non-iCal tasks to iCalendar server')
 
     subcmds.add_parser('copy-config', help='Copy sample configuration to configuration directory.')
     args = cmd.parse_args()
