@@ -6,16 +6,23 @@ icaltask
    :width: 100%
    :align: center
 
-icaltask is a Taskwarrior hook that  
+icaltask is a `taskwarrior <https://taskwarrior.org/>`_ hook that converts taskwarrior tasks into iCalendar VTODO events and exports them to an iCalendar server.  
 
 Install
 -------
+
+Using python-setuptools
+~~~~~~~~~~~~~~~~~~~~~~~
 ::
 
    $ python3 setup.py install
 
 Configuration
 -------------
+Generate the sample configuration file by running the following command. How to use configure the file is documented in the file.
+::
+
+  $ icaltask copy-config
 
 Hooks and UDA Configs
 ~~~~~~~~~~~~~~~~~~~~~
@@ -28,3 +35,7 @@ To remove the hooks and UDA configuration run the following command
 ::
 
   $ icaltask uninstall
+
+Related Projects
+----------------
+`baikal-storage-plugin <https://github.com/Aerex/baikal-storage-plugin>`_
