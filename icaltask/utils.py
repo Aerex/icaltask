@@ -137,7 +137,7 @@ def task_to_ical(original, modified):
     if 'uid' not in vobj.contents:
         if 'uid' in original:
             vobj.add('uid').value = original['uid']
-        else
+        else:
             vobj.add('uid').value = original['uuid']
             original['uid'] = vobj.uid.value
         vobj.add('created').value = get_rfc_datetime(datetime.utcnow())
