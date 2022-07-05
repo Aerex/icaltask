@@ -1,17 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import vobject
-import logging
-import uuid
+import warnings
 from urllib.parse import urlparse
 import logging
 from datetime import datetime, timezone
 from platform import system, release
 from tzlocal import get_localzone
-import json
 import sys
-import os
-from requests import auth, put, request
+from requests import request
 
 PROD_ID = '//taskwarrior/{system} {release}/EN'
 logger = logging.getLogger(__name__)
@@ -23,6 +20,18 @@ if logger.level >= 10:
     except ImportError:
         from httplib import HTTPConnection
     HTTPConnection.debuglevel = 1
+
+# TODO: Figure out how to deal with warning messages
+warnings.filterwarnings(
+    "ignore",
+    message="The zone attribute is specific to pytz's interface",
+    append=True
+)
+warnings.filterwarnings(
+    "ignore",
+    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
+    append=True
+)
 
 # TODO:
 # Maybe use a tag or something to disable importing task to ical

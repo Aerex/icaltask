@@ -20,7 +20,7 @@ TASK_TYPE = 'new'
 try:
     if not new:
         original_task = json.loads(old)
-        modified_task =  None
+        modified_task = None
         print(old)
         task = json.loads(old)
     else:
