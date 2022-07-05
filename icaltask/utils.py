@@ -81,7 +81,6 @@ def merge_task(original, modified):
 def urljoin(*args):
     return '/'.join(map(lambda x: str(x).rstrip('/'), args))
 
-
 def generate_cal_url(task, cal, config):
     """ Generate calendar url for new task """
     cal_base_url = config.get(section='general', option='default_calendar')
